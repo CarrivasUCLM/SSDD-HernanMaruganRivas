@@ -1,0 +1,5 @@
+1.Seleccionar <conectar> e introducir el proxy del servicio IceFlix::Main()
+2.Seleccionar <autenticar> e introducir usuario y contraseña
+3.Seleccionar <buscar> e introducir “ejemplo”
+4.Seleccionar primer resultado de búsqueda pulsando “1”
+5.Seleccionar <reproducir>
