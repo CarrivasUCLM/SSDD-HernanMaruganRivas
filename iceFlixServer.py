@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+#-*- conding: utf-8 -*-
+
 import sys
 import Ice
 Ice.loadSlice('iceflix.ice')
