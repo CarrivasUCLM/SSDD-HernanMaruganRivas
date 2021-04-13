@@ -49,10 +49,10 @@ class ServiceAvailabilityI(Ice.Application, IceFlix.ServiceAvailability):
             print ("no such topic found, creating")
             topic = topic_mgr.create(topic_name)
         publisher = topic.getPublisher()
-        ServiceAvailability = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
+        self.main = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
         print("Hola")
         return 0 
-        ####Continuar aqui
+        
 
     
 class Server(Ice.Application):
