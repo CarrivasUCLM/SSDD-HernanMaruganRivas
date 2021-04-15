@@ -11,12 +11,13 @@ import IceStorm
 
 class MainI(IceFlix.Main):
     def getAuthenticator(self, current=None):
-        print("Qué pasa")
+        print("Este es el authenticator")
         sys.stdout.flush()
         
 
-    def getCatalogService(self):
-        return 0
+    def getCatalogService(self, current=None):
+        print("Y este es el catálogo")
+        sys.stdout.flush()
 
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
