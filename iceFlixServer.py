@@ -10,23 +10,16 @@ import IceStorm
 
 
 class MainI(IceFlix.Main):
-    def getAuthenticator(self):
-        return 0
+    def getAuthenticator(self, current=None):
+        print("Qué pasa")
+        sys.stdout.flush()
+        
 
     def getCatalogService(self):
         return 0
 
 
-class ServiceAvailabilityI(Ice.Application, IceFlix.ServiceAvailability):
-    
-    def get_topic_manager(self):
-        key = 'IceStorm.TopicManager.Proxy'
-        proxy = self.communicator().propertyToProxy(key)
-        if proxy is None:
-            print ("property {} not set".format(key))
-            return None
-        print("Using IceStorm in: '%s'" % key)
-        return IceStorm.TopicManagerPrx.checkedCast(proxy)
+class ServiceAvailabilityI(IceFlix.ServiceAvailability):
 
     def catalogService(self, service, id):
         return 0
@@ -36,41 +29,50 @@ class ServiceAvailabilityI(Ice.Application, IceFlix.ServiceAvailability):
 
     def mediaService(self, service, id):
         return 0
-    
-    def __init__(self, servant):
-        topic_mgr = self.get_topic_manager()
-        if not topic_mgr:
-            print('Invalid proxy')
-            return 2
-        topic_name = 'ServiceAvailability'
-        try:
-            topic = topic_mgr.retrieve(topic_name)
-        except IceStorm.NoSuchTopic:
-            print ("no such topic found, creating")
-            topic = topic_mgr.create(topic_name)
-        publisher = topic.getPublisher()
-        self.main = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
-        print("Hola")
-        return 0 
         
 
     
 class Server(Ice.Application):
-    
+
+    def get_topic_manager(self):
+        key = 'IceStorm.TopicManager.Proxy'
+        proxy = self.communicator().propertyToProxy(key)
+        if proxy is None:
+            print("property '{}' not set".format(key))
+            return None
+
+        print("Using IceStorm in: '%s'" % key)
+        return IceStorm.TopicManagerPrx.checkedCast(proxy)
+
     def run(self, argv):
-        broker = self.communicator()
+        topic_mgr = self.get_topic_manager()
+        if not topic_mgr:
+            print("Invalid proxy")
+            return 2
+
+        ic = self.communicator()
         servant = MainI()
+        adapter = ic.createObjectAdapter("MainAdapter")
+        subscriber = adapter.addWithUUID(servant)
 
-        adapter = broker.createObjectAdapter("MainAdapter")
-        proxy = adapter.add(servant, broker.stringToIdentity("main"))
+        topic_name = "IceFlixTopic"
+        qos = {}
+        try:
+            topic = topic_mgr.retrieve(topic_name)
+        except IceStorm.NoSuchTopic:
+            topic = topic_mgr.create(topic_name)
 
-        print(proxy, flush=True)
+        topic.subscribeAndGetPublisher(qos, subscriber)
+        print("Waiting events... '{}'".format(subscriber))
 
         adapter.activate()
         self.shutdownOnInterrupt()
-        broker.waitForShutdown()
+        ic.waitForShutdown()
+
+        topic.unsubscribe(subscriber)
 
         return 0
+    
 
 
 server = Server()
