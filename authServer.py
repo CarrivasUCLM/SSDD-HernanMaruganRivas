@@ -6,15 +6,71 @@ import Ice
 import IceStorm
 Ice.loadSlice('iceflix.ice')
 
-
 import IceFlix
 
+USERS_FILE = 'users.json'
+PASSWORD_HASH = 'password_hash'
+CURRENT_TOKEN = 'current_token'
+TOKEN_SIZE = 40
+
+def _build_token_():
+    valid_chars = string.digits + string.ascii_letters
+    return ''.join([random.choice(valid_chars) for _ in range(TOKEN_SIZE)])
+
+
 class AuthenticatorI(IceFlix.Authenticator):
-    def refreshAuthorization(self, user, passwordHash):
-        return 0
+    def __init__(self):
+        self._users_ = {}
+        self._active_tokens_ = set()
+        if os.path.exists(USERS_FILE):
+            self.refresh()
+        else:
+            self.__commit__()
+    
+    def refresh(self, *args, **kwargs):
+        '''Reload user DB to RAM'''
+        logging.debug('Reloading user database')
+        with open(USERS_FILE, 'r') as contents:
+            self._users_ = json.load(contents)
+        self._active_tokens_ = set([
+            user.get(CURRENT_TOKEN, None) for user in self._users_.values()
+        ])
+
+    def __commit__(self):
+        logging.debug('User database updated!')
+        with open(USERS_FILE, 'w') as contents:
+            json.dump(self._users_, contents, indent=4, sort_keys=True)
+
+    def refreshAuthorization(self, user, passwordHash, current=None):
+        '''Create new auth token'''
+        logging.debug(f'New token requested by {user}')
+        if user not in self._users_:
+            raise IceGauntlet.Unauthorized()
+        current_hash = self._users_[user].get(PASSWORD_HASH, None)
+        if not current_hash:
+            # User auth is empty
+            raise IceGauntlet.Unauthorized()
+        if current_hash != passwordHash:
+            raise IceGauntlet.Unauthorized()
+
+        current_token = self._users_[user].get(CURRENT_TOKEN, None)
+        if current_token:
+            # pylint: disable=W0702
+            try:
+                self._active_tokens_.remove(current_token)
+            except:
+                # Token is already inactive!
+                pass
+            # pylint: enable=W0702
+        new_token = _build_token_()
+        self._users_[user][CURRENT_TOKEN] = new_token
+        self.__commit__()
+        self._active_tokens_.add(new_token)
+        return new_token
     
     def isAuthorized(self, authentication):
-        return True
+        '''Return if token is active'''
+        return token in self._active_tokens_
 
 class TokenRevocationI(IceFlix.TokenRevocation):
     def revoke(self, authentication):
