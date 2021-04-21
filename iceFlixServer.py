@@ -52,11 +52,11 @@ class Server(Ice.Application):
             return 2
 
         ic = self.communicator()
-        servant = MainI()
+        servant = ServiceAvailabilityI()
         adapter = ic.createObjectAdapter("MainAdapter")
         subscriber = adapter.addWithUUID(servant)
 
-        topic_name = "IceFlixTopic"
+        topic_name = "ServiceAvailability"
         qos = {}
         try:
             topic = topic_mgr.retrieve(topic_name)
