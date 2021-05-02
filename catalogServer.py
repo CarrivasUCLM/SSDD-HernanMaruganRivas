@@ -45,7 +45,7 @@ class Server(Ice.Application):
             print('Invalid proxy')
             return 2
 
-        topic_name = "IceFlixTopic"
+        topic_name = "ServiceAvailability"
         try:
             topic = topic_mgr.retrieve(topic_name)
         except IceStorm.NoSuchTopic:
@@ -55,8 +55,17 @@ class Server(Ice.Application):
         publisher = topic.getPublisher()
         iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
 
-        print("Te mando pallá una cosilla")
-        
+
+        topic_media = "MediaAnnouncements"
+        try:
+            topic = topic_mgr.retrieve(topic_media)
+        except IceStorm.NoSuchTopic:
+            print("no such topic found, creating")
+            topic = topic_mgr.create(topic_media)
+
+        publisher = topic.getPublisher()
+        iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
+
         iceflix.getCatalogService()
         return 0
 

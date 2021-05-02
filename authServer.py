@@ -100,17 +100,18 @@ class Server(Ice.Application):
             print("no such topic found, creating")
             topic = topic_mgr.create(topic_name)
         
-        topic_nae = "otrocanal"
-        try:
-            topic = topic_mgr.retrieve(topic_name)
-        except IceStorm.NoSuchTopic:
-            print("no such topic found, creating")
-            topic = topic_mgr.create(topic_name)
-
         publisher = topic.getPublisher()
         iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
 
-        print("Te mando pallá una cosilla")
+        topic_auth = "AuthenticationStatus"
+        try:
+            topic = topic_mgr.retrieve(topic_auth)
+        except IceStorm.NoSuchTopic:
+            print("no such topic found, creating")
+            topic = topic_mgr.create(topic_auth)
+
+        publisher = topic.getPublisher()
+        iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
         
         iceflix.getAuthenticator()
         return 0

@@ -23,14 +23,16 @@ class MainI(IceFlix.Main):
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
 
     def catalogService(self, service, id):
+
         return 0
 
     def authenticationService(self, service, id):
+
         return 0
 
     def mediaService(self, service, id):
+
         return 0
-        
 
     
 class Server(Ice.Application):
@@ -58,6 +60,7 @@ class Server(Ice.Application):
 
         topic_name = "ServiceAvailability"
         qos = {}
+        
         try:
             topic = topic_mgr.retrieve(topic_name)
         except IceStorm.NoSuchTopic:
