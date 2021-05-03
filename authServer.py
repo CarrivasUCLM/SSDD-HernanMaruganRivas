@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #-*- conding: utf-8 -*-
-
+import uuid
+import os.path
 import sys
 import Ice
 import IceStorm
@@ -20,12 +21,13 @@ def _build_token_():
 
 class AuthenticatorI(IceFlix.Authenticator):
     def __init__(self):
-        self._users_ = {}
+        self._id_= str(uuid.uuid4())
+        '''self._users_ = {}
         self._active_tokens_ = set()
         if os.path.exists(USERS_FILE):
             self.refresh()
         else:
-            self.__commit__()
+           self.__commit__()'''
     
     def refresh(self, *args, **kwargs):
         '''Reload user DB to RAM'''
@@ -87,6 +89,7 @@ class Server(Ice.Application):
         print("Using IceStorm in: '%s'" % key)
         return IceStorm.TopicManagerPrx.checkedCast(proxy)
 
+
     def run(self, argv):
         topic_mgr = self.get_topic_manager()
         if not topic_mgr:
@@ -99,11 +102,16 @@ class Server(Ice.Application):
         except IceStorm.NoSuchTopic:
             print("no such topic found, creating")
             topic = topic_mgr.create(topic_name)
+          
         
         publisher = topic.getPublisher()
-        iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
+        iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
+        autenticator = AuthenticatorI()
+        iceflix.authenticationService(None, autenticator._id_)
+        
 
-        topic_auth = "AuthenticationStatus"
+
+        '''topic_auth = "AuthenticationStatus"
         try:
             topic = topic_mgr.retrieve(topic_auth)
         except IceStorm.NoSuchTopic:
@@ -112,8 +120,7 @@ class Server(Ice.Application):
 
         publisher = topic.getPublisher()
         iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
-        
-        iceflix.getAuthenticator()
+        iceflix.getAuthenticator()'''
         return 0
 
 server = Server()

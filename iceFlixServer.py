@@ -22,19 +22,18 @@ class MainI(IceFlix.Main):
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
 
-    def catalogService(self, service, id):
-
+    def catalogService(self, service, id, current=None):
+        print("New catalog service:")
         return 0
 
-    def authenticationService(self, service, id):
-
+    def authenticationService(self, service, id, current=None):
+        print("New authentication service:'{}'".format(id))
         return 0
 
-    def mediaService(self, service, id):
-
+    def mediaService(self, service, id, current=None):
+        print("New media service:'{}'".format(id))
         return 0
-
-    
+ 
 class Server(Ice.Application):
 
     def get_topic_manager(self):
@@ -68,6 +67,8 @@ class Server(Ice.Application):
 
         topic.subscribeAndGetPublisher(qos, subscriber)
         print("Waiting events... '{}'".format(subscriber))
+
+        topic.getPublisher()
 
         adapter.activate()
         self.shutdownOnInterrupt()

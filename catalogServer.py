@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 #-*- conding: utf-8 -*-
 
+import uuid
+import os.path
 import sys
 import Ice
 import IceStorm
@@ -9,6 +11,10 @@ Ice.loadSlice('iceflix.ice')
 import IceFlix
 
 class MediaCatalogI(IceFlix.MediaCatalog):
+    
+    def __init__(self):
+        self._id_= str(uuid.uuid4())
+
     def getTile(self, id):
         return 0
     
@@ -53,7 +59,9 @@ class Server(Ice.Application):
             topic = topic_mgr.create(topic_name)
 
         publisher = topic.getPublisher()
-        iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
+        iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
+        catalog = MediaCatalogI()
+        iceflix.catalogService(None, catalog._id_)
 
 
         topic_media = "MediaAnnouncements"
@@ -66,7 +74,7 @@ class Server(Ice.Application):
         publisher = topic.getPublisher()
         iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
 
-        iceflix.getCatalogService()
+        '''iceflix.getCatalogService()'''
         return 0
 
 
