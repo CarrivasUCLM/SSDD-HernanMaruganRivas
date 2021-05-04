@@ -23,7 +23,7 @@ class MainI(IceFlix.Main):
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
 
     def catalogService(self, service, id, current=None):
-        print("New catalog service:")
+        print("New catalog service: '{}'".format(id))
         return 0
 
     def authenticationService(self, service, id, current=None):
