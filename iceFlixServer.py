@@ -22,23 +22,26 @@ class MainI(IceFlix.Main):
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def __init__(self):
-        self.listaServices = []
+        self.listaCatalog = []
+        self.listaAuth=[]
+        self.listaMedia=[]
 
-    def addById(self, id, current=None):
+    def addById(self, id, lista, current=None):
 
         _id=format(id)
-        if _id not in self.listaServices:
-            self.listaServices.append(_id)
-        print(self.listaServices)
+        lista.append(_id)
+        print(lista)
+
     
-    def removeById(self, id, currento=None):
+    def removeById(self, id, lista, current=None):
         _id=format(id)
-        self.listaServices.remove(id)
+        self.lista.remove(_id)
+       
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
         _id=format(id)
-        self.addById(_id)
+        self.addById(_id, self.listaCatalog)
        
  
         return 0
@@ -46,13 +49,15 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id)
+        self.addById(_id, self.listaAuth)
 
         
         return 0
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
+        _id=format(id)
+        self.addById(_id, self.listaMedia)
         
         return 0
     
