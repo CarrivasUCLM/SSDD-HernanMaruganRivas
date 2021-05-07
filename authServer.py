@@ -9,6 +9,7 @@ Ice.loadSlice('iceflix.ice')
 import iceevents
 import IceFlix
 
+
 USERS_FILE = 'users.json'
 PASSWORD_HASH = 'password_hash'
 CURRENT_TOKEN = 'current_token'
@@ -47,13 +48,13 @@ class AuthenticatorI(IceFlix.Authenticator):
         '''Create new auth token'''
         logging.debug(f'New token requested by {user}')
         if user not in self._users_:
-            raise IceGauntlet.Unauthorized()
+            raise IceFlix.Unauthorized()
         current_hash = self._users_[user].get(PASSWORD_HASH, None)
         if not current_hash:
             # User auth is empty
-            raise IceGauntlet.Unauthorized()
+            raise IceFlix.Unauthorized()
         if current_hash != passwordHash:
-            raise IceGauntlet.Unauthorized()
+            raise IceFlix.Unauthorized()
 
         current_token = self._users_[user].get(CURRENT_TOKEN, None)
         if current_token:
@@ -78,6 +79,44 @@ class TokenRevocationI(IceFlix.TokenRevocation):
     def revoke(self, authentication):
         return 0
 
+class ServiceAvailabilityI(IceFlix.ServiceAvailability):
+    def __init__(self):
+        self._id_= str(uuid.uuid4())
+        self.listaServices = []
+
+    def addById(self, id, current=None):
+
+        _id=format(id)
+        if _id not in self.listaServices:
+            self.listaServices.append(_id)
+        print(self.listaServices)
+    
+    def removeById(self, id, currento=None):
+        _id=format(id)
+        self.listaServices.remove(id)
+
+    def catalogService(self, service, id, current=None):
+        print("New catalog service: '{}'".format(id))
+        _id=format(id)
+        self.addById(_id)
+       
+ 
+        return 0
+
+    def authenticationService(self, service, id, current=None):
+        print("New authentication service:'{}'".format(id))
+        _id=format(id)
+        self.addById(_id)
+        
+        
+        return 0
+
+    def mediaService(self, service, id, current=None):
+        print("New media service:'{}'".format(id))
+        
+        return 0
+    
+
 class Server(Ice.Application):
   
     def run(self, argv):
@@ -93,7 +132,7 @@ class Server(Ice.Application):
 
         broker = event.communicator()
     
-        adapter = broker.createObjectAdapter("MainAdapter")
+        adapter = broker.createObjectAdapter("ServiceAvailabilityAdapter")
         proxy = broker.stringToProxy('IceStorm.TopicManager.Proxy')
         event.subscribe('ServiceAvailability', proxy)
         print("Waiting events... '{}'".format(proxy))
@@ -102,6 +141,10 @@ class Server(Ice.Application):
         broker.waitForShutdown()
 
         topic.unsubscribe(subscriber)
+
+        broker = event.communicator()
+        adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
+
 
 
         '''topic_auth = "AuthenticationStatus"

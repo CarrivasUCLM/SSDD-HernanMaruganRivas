@@ -47,6 +47,7 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         print("New authentication service:'{}'".format(id))
         _id=format(id)
         self.addById(_id)
+
         
         return 0
 
@@ -54,7 +55,6 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         print("New media service:'{}'".format(id))
         
         return 0
-    
     
 class Server(Ice.Application):
 
@@ -76,7 +76,7 @@ class Server(Ice.Application):
 
         ic = self.communicator()
         servant = ServiceAvailabilityI()
-        adapter = ic.createObjectAdapter("MainAdapter")
+        adapter = ic.createObjectAdapter("ServiceAvailabilityAdapter")
         subscriber = adapter.addWithUUID(servant)
 
         topic_name = "ServiceAvailability"
@@ -92,6 +92,14 @@ class Server(Ice.Application):
 
         
         topic.getPublisher()
+
+        adapter.activate()
+
+        broker=self.communicator()
+        servant =MainI()
+        adapter=broker.createObjectAdapter("MainAdapter")
+        proxy=adapter.addWithUUID(servant)
+        print(proxy,flush=True)
 
         adapter.activate()
 
