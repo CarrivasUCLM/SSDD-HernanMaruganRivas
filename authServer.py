@@ -6,7 +6,7 @@ import sys
 import Ice
 import IceStorm
 Ice.loadSlice('iceflix.ice')
-
+import iceevents
 import IceFlix
 
 USERS_FILE = 'users.json'
@@ -79,36 +79,29 @@ class TokenRevocationI(IceFlix.TokenRevocation):
         return 0
 
 class Server(Ice.Application):
-    def get_topic_manager(self):
-        key = 'IceStorm.TopicManager.Proxy'
-        proxy = self.communicator().propertyToProxy(key)
-        if proxy is None:
-            print("property {} not set".format(key))
-            return None
-
-        print("Using IceStorm in: '%s'" % key)
-        return IceStorm.TopicManagerPrx.checkedCast(proxy)
-
-
+  
     def run(self, argv):
-        topic_mgr = self.get_topic_manager()
-        if not topic_mgr:
-            print('Invalid proxy')
-            return 2
-
-        topic_name = "ServiceAvailability"
-        try:
-            topic = topic_mgr.retrieve(topic_name)
-        except IceStorm.NoSuchTopic:
-            print("no such topic found, creating")
-            topic = topic_mgr.create(topic_name)
-          
+        event = iceevents.IceEvents(self.communicator())
+        topic_manager = event.get_topic_manager()
+        topic = event.get_topic('ServiceAvailability')
         
-        publisher = topic.getPublisher()
+        publisher = event.get_publisher('ServiceAvailability')
         iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
         autenticator = AuthenticatorI()
         iceflix.authenticationService(None, autenticator._id_)
         
+
+        broker = event.communicator()
+    
+        adapter = broker.createObjectAdapter("MainAdapter")
+        proxy = broker.stringToProxy('IceStorm.TopicManager.Proxy')
+        event.subscribe('ServiceAvailability', proxy)
+        print("Waiting events... '{}'".format(proxy))
+        topic.getPublisher()
+        adapter.activate()
+        broker.waitForShutdown()
+
+        topic.unsubscribe(subscriber)
 
 
         '''topic_auth = "AuthenticationStatus"

@@ -6,6 +6,7 @@ import os.path
 import sys
 import Ice
 import IceStorm
+import iceevents
 Ice.loadSlice('iceflix.ice')
 
 import IceFlix
@@ -35,36 +36,18 @@ class MediaCatalogI(IceFlix.MediaCatalog):
     
 
 class Server(Ice.Application):
-    def get_topic_manager(self):
-        key = 'IceStorm.TopicManager.Proxy'
-        proxy = self.communicator().propertyToProxy(key)
-        if proxy is None:
-            print("property {} not set".format(key))
-            return None
-
-        print("Using IceStorm in: '%s'" % key)
-        return IceStorm.TopicManagerPrx.checkedCast(proxy)
 
     def run(self, argv):
-        topic_mgr = self.get_topic_manager()
-        if not topic_mgr:
-            print('Invalid proxy')
-            return 2
-
-        topic_name = "ServiceAvailability"
-        try:
-            topic = topic_mgr.retrieve(topic_name)
-        except IceStorm.NoSuchTopic:
-            print("no such topic found, creating")
-            topic = topic_mgr.create(topic_name)
-
-        publisher = topic.getPublisher()
+        event = iceevents.IceEvents(self.communicator())
+        topic_manager = event.get_topic_manager()
+        topic = event.get_topic('ServiceAvailability')
+        
+        publisher = event.get_publisher('ServiceAvailability')
         iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
         catalog = MediaCatalogI()
         iceflix.catalogService(None, catalog._id_)
 
-
-        topic_media = "MediaAnnouncements"
+        '''topic_media = "MediaAnnouncements"
         try:
             topic = topic_mgr.retrieve(topic_media)
         except IceStorm.NoSuchTopic:
@@ -74,7 +57,7 @@ class Server(Ice.Application):
         publisher = topic.getPublisher()
         iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
 
-        '''iceflix.getCatalogService()'''
+        iceflix.getCatalogService()'''
         return 0
 
 
