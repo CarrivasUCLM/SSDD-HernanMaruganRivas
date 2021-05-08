@@ -86,68 +86,86 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         self.listaMedia=[]
 
     def addById(self, id, lista, current=None):
-
         _id=format(id)
         lista.append(_id)
         print(lista)
-
     
     def removeById(self, id, lista, current=None):
         _id=format(id)
-        self.lista.remove(_id)
-       
+        self.lista.remove(_id)     
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
         _id=format(id)
         self.addById(_id, self.listaCatalog)
-       
- 
-        return 0
 
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
         _id=format(id)
         self.addById(_id, self.listaAuth)
 
-        
-        return 0
+    def mediaService(self, service, id, current=None):
+        print("New media service:'{}'".format(id))
+        _id=format(id)
+        self.addById(_id, self.listaMedia)
+
+
+class ServiceAvailabilityI(IceFlix.ServiceAvailability):
+    def __init__(self):
+        self.listaCatalog = []
+        self.listaAuth=[]
+        self.listaMedia=[]
+
+    def addById(self, id, lista, current=None):
+        _id=format(id)
+        lista.append(_id)
+        print(lista)
+
+    def removeById(self, id, lista, current=None):
+        _id=format(id)
+        self.lista.remove(_id)   
+
+    def catalogService(self, service, id, current=None):
+        print("New catalog service: '{}'".format(id))
+        _id=format(id)
+        self.addById(_id, self.listaCatalog)
+
+    def authenticationService(self, service, id, current=None):
+        print("New authentication service:'{}'".format(id))
+        _id=format(id)
+        self.addById(_id, self.listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
         _id=format(id)
         self.addById(_id, self.listaMedia)
-        
-        return 0
+
 
 class Server(Ice.Application):
   
     def run(self, argv):
+        '''Publisher'''
         event = iceevents.IceEvents(self.communicator())
         topic_manager = event.get_topic_manager()
         topic = event.get_topic('ServiceAvailability')
-        
         publisher = event.get_publisher('ServiceAvailability')
         iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
         autenticator = AuthenticatorI()
-        iceflix.authenticationService(None, autenticator._id_)
         
-
-        broker = event.communicator()
-    
-        adapter = broker.createObjectAdapter("ServiceAvailabilityAdapter")
-        proxy = broker.stringToProxy('IceStorm.TopicManager.Proxy')
-        event.subscribe('ServiceAvailability', proxy)
-        print("Waiting events... '{}'".format(proxy))
+        '''Subscriber'''
+        eventSubscriber = iceevents.IceEvents(self.communicator())
+        broker = eventSubscriber.communicator()
+        topic_manager = eventSubscriber.get_topic_manager()
+        servant = ServiceAvailabilityI()
+        adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
+        subscriber = adapter.addWithUUID(servant)
+        eventSubscriber.subscribe('ServiceAvailability', subscriber)
+        iceflix.authenticationService(None, autenticator._id_)
+        print("Waiting events... '{}'".format(subscriber))
         topic.getPublisher()
         adapter.activate()
         broker.waitForShutdown()
-
         topic.unsubscribe(subscriber)
-
-        broker = event.communicator()
-        adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
-
 
 
         '''topic_auth = "AuthenticationStatus"
