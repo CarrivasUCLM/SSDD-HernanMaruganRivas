@@ -41,30 +41,29 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         self.listaAuth=[]
         self.listaMedia=[]
 
-    def addById(self, id, lista, current=None):
+    def addById(self, service, id, lista, current=None):
         _id=format(id)
-        lista.append(_id)
+        lista.append([service, _id])
         print(lista)
 
     def removeById(self, id, lista, current=None):
         _id=format(id)
-        self.lista.remove(_id)
-    
+        self.lista.remove(_id)   
+
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaCatalog)
+        self.addById(service, _id, self.listaCatalog)
 
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaAuth)
+        self.addById(service,_id, self.listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaMedia)
-           
+        self.addById(service, _id, self.listaMedia)
 
 class Server(Ice.Application):
 
@@ -85,7 +84,7 @@ class Server(Ice.Application):
         adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
         subscriber = adapter.addWithUUID(servant)
         eventSubscriber.subscribe('ServiceAvailability', subscriber)
-        iceflix.catalogService(None, catalog._id_)
+        iceflix.catalogService(IceFlix.MediaCatalogPrx.checkedCast(subscriber), catalog._id_)
         print("Waiting events... '{}'".format(subscriber))
         topic.getPublisher()
         adapter.activate()

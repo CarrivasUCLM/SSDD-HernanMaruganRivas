@@ -10,6 +10,7 @@ import os
 import sys
 import json
 import signal
+import hashlib
 
 import psutil
 
@@ -27,7 +28,7 @@ def auth_server_pid():
             for arg in proc.cmdline():
                 if arg.startswith('./'):
                     arg = arg[2:]
-                if arg == 'auth_server':
+                if arg == 'authServer.py':
                     return proc.pid
     return None
 
@@ -38,6 +39,14 @@ def main():
     '''
     try:
         username = sys.argv[1]
+    except IndexError:
+        print('ERROR: enter a username to reset auth data')
+        return EXIT_ERROR
+
+     try:
+        password = sys.argv[2]
+
+        password_hash = hashlib.sha256(password.encode('utf8')).hexdigest()
     except IndexError:
         print('ERROR: enter a username to reset auth data')
         return EXIT_ERROR
@@ -56,9 +65,11 @@ def main():
     except ValueError:
         print('ERROR: corrupt user data!')
         return EXIT_ERROR
-    users[username] = {}
+    users[username] = {'password_hash':password_hash}
     with open('users.json', 'w') as contents:
         json.dump(users, contents, indent=2, sort_keys=True)
-    os.kill(server_pid, signal.SIGUSR1)
+     #os.kill(server_pid, signal.SIGUSR1)
 
     return EXIT_OK
+
+    

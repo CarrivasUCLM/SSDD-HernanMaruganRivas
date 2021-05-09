@@ -8,17 +8,20 @@ Ice.loadSlice('iceflix.ice')
 import IceFlix
 import IceStorm
 
-
 class MainI(IceFlix.Main):
     def getAuthenticator(self, current=None):
-        print("Este es el authenticator")
-        sys.stdout.flush()
-        
+        try:
+            print("Este es el authenticator")
+            sys.stdout.flush()
+        except IceStorm.TemporaryUnavailable:
+            print("No hay servicios de autenticacion")
 
     def getCatalogService(self, current=None):
-        print("Y este es el catálogo")
-        sys.stdout.flush()
-
+        try:
+            print("Y este es el catálogo")
+            sys.stdout.flush()
+        except IceStorm.TemporaryUnavailable:
+            print("No hay servicios de catalogo")
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def __init__(self):
@@ -26,40 +29,31 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         self.listaAuth=[]
         self.listaMedia=[]
 
-    def addById(self, id, lista, current=None):
-
+    def addById(self, service, id, lista, current=None):
         _id=format(id)
-        lista.append(_id)
+        lista.append([service, _id])
         print(lista)
-
     
     def removeById(self, id, lista, current=None):
         _id=format(id)
         self.lista.remove(_id)
-       
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaCatalog)
-       
+        self.addById(service, _id, self.listaCatalog)
  
-        return 0
-
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaAuth)
-
-        
-        return 0
+        _service = format(service)
+        self.addById(_service, _id, self.listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaMedia)
-        
-        return 0
+        self.addById(service, _id, self.listaMedia)
+
     
 class Server(Ice.Application):
 
@@ -93,7 +87,7 @@ class Server(Ice.Application):
             topic = topic_mgr.create(topic_name)
 
         topic.subscribeAndGetPublisher(qos, subscriber)
-        print("Waiting events... '{}'".format(subscriber))
+        #print("Waiting events... '{}'".format(subscriber))
 
         
         topic.getPublisher()

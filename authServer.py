@@ -23,9 +23,9 @@ def _build_token_():
 class AuthenticatorI(IceFlix.Authenticator):
     def __init__(self):
         self._id_= str(uuid.uuid4())
-        '''self._users_ = {}
+        self._users_ = {}
         self._active_tokens_ = set()
-        if os.path.exists(USERS_FILE):
+        '''if os.path.exists(USERS_FILE):
             self.refresh()
         else:
            self.__commit__()'''
@@ -116,9 +116,9 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         self.listaAuth=[]
         self.listaMedia=[]
 
-    def addById(self, id, lista, current=None):
+    def addById(self, service, id, lista, current=None):
         _id=format(id)
-        lista.append(_id)
+        lista.append([service, _id])
         print(lista)
 
     def removeById(self, id, lista, current=None):
@@ -128,17 +128,17 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaCatalog)
+        self.addById(service, _id, self.listaCatalog)
 
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaAuth)
+        self.addById(format(service),_id, self.listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
         _id=format(id)
-        self.addById(_id, self.listaMedia)
+        self.addById(service, _id, self.listaMedia)
 
 
 class Server(Ice.Application):
@@ -160,7 +160,7 @@ class Server(Ice.Application):
         adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
         subscriber = adapter.addWithUUID(servant)
         eventSubscriber.subscribe('ServiceAvailability', subscriber)
-        iceflix.authenticationService(None, autenticator._id_)
+        iceflix.authenticationService(IceFlix.AuthenticatorPrx.checkedCast(subscriber), autenticator._id_)
         print("Waiting events... '{}'".format(subscriber))
         topic.getPublisher()
         adapter.activate()
