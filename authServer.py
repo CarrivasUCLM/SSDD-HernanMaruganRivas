@@ -23,12 +23,12 @@ def _build_token_():
 class AuthenticatorI(IceFlix.Authenticator):
     def __init__(self):
         self._id_= str(uuid.uuid4())
-        '''self._users_ = {}
+        self._users_ = {}
         self._active_tokens_ = set()
         if os.path.exists(USERS_FILE):
             self.refresh()
         else:
-           self.__commit__()'''
+           self.__commit__()
     
     def refresh(self, *args, **kwargs):
         '''Reload user DB to RAM'''
