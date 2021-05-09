@@ -1,5 +1,12 @@
 {
+<<<<<<< HEAD
     "carlos": {
       "password_hash": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
     }
   } 
+=======
+  "carlos": {
+    "password_hash": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+  }
+}
+>>>>>>> 308134f14ca2b7189e35981b3bc92adec46e0b2c

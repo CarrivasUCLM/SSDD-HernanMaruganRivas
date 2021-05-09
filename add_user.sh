@@ -43,9 +43,15 @@ def main():
         print('ERROR: enter a username to reset auth data')
         return EXIT_ERROR
 
+<<<<<<< HEAD
      try:
         password = sys.argv[2]
 
+=======
+    try:
+        password = sys.argv[2]
+       
+>>>>>>> 308134f14ca2b7189e35981b3bc92adec46e0b2c
         password_hash = hashlib.sha256(password.encode('utf8')).hexdigest()
     except IndexError:
         print('ERROR: enter a username to reset auth data')
@@ -68,8 +74,18 @@ def main():
     users[username] = {'password_hash':password_hash}
     with open('users.json', 'w') as contents:
         json.dump(users, contents, indent=2, sort_keys=True)
+<<<<<<< HEAD
      #os.kill(server_pid, signal.SIGUSR1)
 
     return EXIT_OK
 
     
+=======
+    #os.kill(server_pid, signal.SIGUSR1)
+
+    return EXIT_OK
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+>>>>>>> 308134f14ca2b7189e35981b3bc92adec46e0b2c

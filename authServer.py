@@ -28,7 +28,7 @@ class AuthenticatorI(IceFlix.Authenticator):
         '''if os.path.exists(USERS_FILE):
             self.refresh()
         else:
-           self.__commit__()'''
+           self.__commit__()
     
     def refresh(self, *args, **kwargs):
         '''Reload user DB to RAM'''
