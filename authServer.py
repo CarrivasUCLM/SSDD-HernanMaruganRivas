@@ -25,7 +25,7 @@ class AuthenticatorI(IceFlix.Authenticator):
         self._id_= str(uuid.uuid4())
         self._users_ = {}
         self._active_tokens_ = set()
-        '''if os.path.exists(USERS_FILE):
+        if os.path.exists(USERS_FILE):
             self.refresh()
         else:
            self.__commit__()
