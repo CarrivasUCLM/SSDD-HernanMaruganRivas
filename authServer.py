@@ -8,6 +8,8 @@ import IceStorm
 Ice.loadSlice('iceflix.ice')
 import iceevents
 import IceFlix
+import logging
+import json
 
 
 USERS_FILE = 'users.json'
