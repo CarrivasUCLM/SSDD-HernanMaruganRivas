@@ -151,8 +151,9 @@ class Server(Ice.Application):
         topic_manager = event.get_topic_manager()
         topic = event.get_topic('ServiceAvailability')
         publisher = event.get_publisher('ServiceAvailability')
-        iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
-        autenticator = AuthenticatorI()
+        publisher_services = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
+        
+
         
         '''Subscriber'''
         eventSubscriber = iceevents.IceEvents(self.communicator())
@@ -160,12 +161,20 @@ class Server(Ice.Application):
         topic_manager = eventSubscriber.get_topic_manager()
         servant = ServiceAvailabilityI()
         adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
-        subscriber = adapter.addWithUUID(servant)
-        eventSubscriber.subscribe('ServiceAvailability', subscriber)
-        iceflix.authenticationService(IceFlix.AuthenticatorPrx.checkedCast(subscriber), autenticator._id_)
-        print("Waiting events... '{}'".format(subscriber))
-        topic.getPublisher()
+        proxy_subscriber = adapter.addWithUUID(servant)
+        eventSubscriber.subscribe('ServiceAvailability', proxy_subscriber)
+
+
+        "Comunicacion directa"
         adapter.activate()
+        broker2 = self.communicator()
+        autenticator = AuthenticatorI()
+        adapter2 = broker2.createObjectAdapter("AuthenticatorAdapter")
+        proxy=adapter.addWithUUID(autenticator)
+        publisher_services.authenticationService(IceFlix.AuthenticatorPrx.checkedCast(proxy), autenticator._id_)
+        print("Waiting events... '{}'".format(proxy))
+        topic.getPublisher()
+        
         broker.waitForShutdown()
         topic.unsubscribe(subscriber)
 
