@@ -81,66 +81,32 @@ class TokenRevocationI(IceFlix.TokenRevocation):
     def revoke(self, authentication):
         return 0
 
+
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def __init__(self):
         self.listaCatalog = []
         self.listaAuth=[]
         self.listaMedia=[]
 
-    def addById(self, id, lista, current=None):
-        _id=format(id)
-        lista.append(_id)
+    def addService(self, service, lista, current=None):
+        lista.append(service)
         print(lista)
     
     def removeById(self, id, lista, current=None):
         _id=format(id)
-        self.lista.remove(_id)     
+        self.lista.remove(_id)
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
-        _id=format(id)
-        self.addById(_id, self.listaCatalog)
-
+        self.addService(service, self.listaCatalog)
+ 
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
-        _id=format(id)
-        self.addById(_id, self.listaAuth)
+        self.addService(service, self.listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
-        _id=format(id)
-        self.addById(_id, self.listaMedia)
-
-
-class ServiceAvailabilityI(IceFlix.ServiceAvailability):
-    def __init__(self):
-        self.listaCatalog = []
-        self.listaAuth=[]
-        self.listaMedia=[]
-
-    def addById(self, service, id, lista, current=None):
-        _id=format(id)
-        lista.append([service, _id])
-        print(lista)
-
-    def removeById(self, id, lista, current=None):
-        _id=format(id)
-        self.lista.remove(_id)   
-
-    def catalogService(self, service, id, current=None):
-        print("New catalog service: '{}'".format(id))
-        _id=format(id)
-        self.addById(service, _id, self.listaCatalog)
-
-    def authenticationService(self, service, id, current=None):
-        print("New authentication service:'{}'".format(id))
-        _id=format(id)
-        self.addById(format(service),_id, self.listaAuth)
-
-    def mediaService(self, service, id, current=None):
-        print("New media service:'{}'".format(id))
-        _id=format(id)
-        self.addById(service, _id, self.listaMedia)
+        self.addService(service, self.listaMedia)
 
 
 class Server(Ice.Application):
@@ -176,7 +142,7 @@ class Server(Ice.Application):
         topic.getPublisher()
         
         broker.waitForShutdown()
-        topic.unsubscribe(subscriber)
+        topic.unsubscribe(proxy)
 
 
         '''topic_auth = "AuthenticationStatus"

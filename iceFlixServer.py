@@ -8,51 +8,42 @@ Ice.loadSlice('iceflix.ice')
 import IceFlix
 import IceStorm
 
+listaCatalog = []
+listaAuth=[]
+listaMedia=[]
+
 class MainI(IceFlix.Main):
     def getAuthenticator(self, current=None):
-        try:
-            print("Este es el authenticator")
-            sys.stdout.flush()
-        except IceStorm.TemporaryUnavailable:
-            print("No hay servicios de autenticacion")
+        
+        if not listaAuth:
+            raise IceFlix.TemporaryUnavailable()
+        else:  
+            return listaAuth.pop() 
 
     def getCatalogService(self, current=None):
-        try:
-            print("Y este es el catálogo")
-            sys.stdout.flush()
-        except IceStorm.TemporaryUnavailable:
-            print("No hay servicios de catalogo")
+        
+        if not listaCatalog:
+            raise IceFlix.TemporaryUnavailable()
+        else:  
+            return listaCatalog.pop()
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
-    def __init__(self):
-        self.listaCatalog = []
-        self.listaAuth=[]
-        self.listaMedia=[]
-
-    def addById(self, service, id, lista, current=None):
-        _id=format(id)
-        lista.append([service, _id])
-        print(lista)
     
-    def removeById(self, id, lista, current=None):
-        _id=format(id)
-        self.lista.remove(_id)
+    def addService(self, service, lista, current=None):
+        lista.append(service)
+        print(lista)
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
-        _id=format(id)
-        self.addById(service, _id, self.listaCatalog)
+        self.addService(service, listaCatalog)
  
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
-        _id=format(id)
-        _service = format(service)
-        self.addById(_service, _id, self.listaAuth)
+        self.addService(service, listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id))
-        _id=format(id)
-        self.addById(service, _id, self.listaMedia)
+        self.addService(service, listaMedia)
 
     
 class Server(Ice.Application):
