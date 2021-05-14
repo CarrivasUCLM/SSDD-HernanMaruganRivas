@@ -8,7 +8,6 @@ import Ice
 import IceStorm
 import iceevents
 Ice.loadSlice('iceflix.ice')
-
 import IceFlix
 
 class MediaCatalogI(IceFlix.MediaCatalog):
@@ -34,7 +33,34 @@ class MediaCatalogI(IceFlix.MediaCatalog):
     def removeTags(self, id, tags, authentication):
         return 0
 
+class StreamControllerI(IceFlix.StreamController):
 
+    def getSDP(self, authenticacion, port, current=None):
+        return 0
+    
+    def getSyncTopic(self, current=None):
+        return 0
+    
+    def refreshAuthentication (self, authenticacion, current = None):
+        return 0
+
+    def stop(self, current=None):
+        return 0
+    
+class StreamProviderI(IceFlix.StreamProvider):
+
+    def __init__(self):
+        self._id_= str(uuid.uuid4())
+
+    def getStream(self, id, authentication):
+        return 0
+    
+    def isAvailable(self, id):
+        return 0
+    
+    def reannounceMedia(self):
+        return 0
+        
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def __init__(self):
         self.listaCatalog = []
@@ -65,36 +91,32 @@ class Server(Ice.Application):
         topic_manager = event.get_topic_manager()
         topic = event.get_topic('ServiceAvailability')
         publisher = event.get_publisher('ServiceAvailability')
-        iceflix = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
-        catalog = MediaCatalogI()
-    
+        publisher_services = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
+        
+
         '''Subscriber'''
         eventSubscriber = iceevents.IceEvents(self.communicator())
         broker = eventSubscriber.communicator()
         topic_manager = eventSubscriber.get_topic_manager()
         servant = ServiceAvailabilityI()
-        adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
-        subscriber = adapter.addWithUUID(servant)
-        eventSubscriber.subscribe('ServiceAvailability', subscriber)
-        iceflix.catalogService(IceFlix.MediaCatalogPrx.checkedCast(subscriber), catalog._id_)
-        print("Waiting events... '{}'".format(subscriber))
-        topic.getPublisher()
+        adapter=broker.createObjectAdapter("IceFlixAdapter")
+        proxy_subscriber = adapter.addWithUUID(servant)
+        eventSubscriber.subscribe('ServiceAvailability', proxy_subscriber)
+
+
+        "Comunicacion directa"
         adapter.activate()
+        broker2 = self.communicator()
+        stream_provider = StreamProviderI()
+        adapter2 = broker2.createObjectAdapter("CatalogAdapter")
+        proxy=adapter.addWithUUID(stream_provider)
+        publisher_services.mediaService(IceFlix.StreamProviderPrx.checkedCast(proxy), stream_provider._id_)
+        print("Waiting events... '{}'".format(proxy))
+        topic.getPublisher()
+        
         broker.waitForShutdown()
-        topic.unsubscribe(subscriber)
+        topic.unsubscribe(proxy)
 
-
-        '''topic_media = "MediaAnnouncements"
-        try:
-            topic = topic_mgr.retrieve(topic_media)
-        except IceStorm.NoSuchTopic:
-            print("no such topic found, creating")
-            topic = topic_mgr.create(topic_media)
-
-        publisher = topic.getPublisher()
-        iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
-
-        iceflix.getCatalogService()'''
         return 0
 
 

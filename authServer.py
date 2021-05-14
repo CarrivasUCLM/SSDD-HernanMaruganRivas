@@ -124,7 +124,7 @@ class Server(Ice.Application):
         broker = eventSubscriber.communicator()
         topic_manager = eventSubscriber.get_topic_manager()
         servant = ServiceAvailabilityI()
-        adapter=broker.createObjectAdapter("ServiceAvailabilityAdapter")
+        adapter=broker.createObjectAdapter("IceFlixAdapter")
         proxy_subscriber = adapter.addWithUUID(servant)
         eventSubscriber.subscribe('ServiceAvailability', proxy_subscriber)
 
@@ -133,7 +133,7 @@ class Server(Ice.Application):
         adapter.activate()
         broker2 = self.communicator()
         autenticator = AuthenticatorI()
-        adapter2 = broker2.createObjectAdapter("AuthenticatorAdapter")
+        adapter2 = broker2.createObjectAdapter("AuthAdapter")
         proxy=adapter.addWithUUID(autenticator)
         publisher_services.authenticationService(IceFlix.AuthenticatorPrx.checkedCast(proxy), autenticator._id_)
         print("Waiting events... '{}'".format(proxy))
@@ -142,17 +142,6 @@ class Server(Ice.Application):
         broker.waitForShutdown()
         topic.unsubscribe(proxy)
 
-
-        '''topic_auth = "AuthenticationStatus"
-        try:
-            topic = topic_mgr.retrieve(topic_auth)
-        except IceStorm.NoSuchTopic:
-            print("no such topic found, creating")
-            topic = topic_mgr.create(topic_auth)
-
-        publisher = topic.getPublisher()
-        iceflix = IceFlix.MainPrx.uncheckedCast(publisher)
-        iceflix.getAuthenticator()'''
         return 0
 
 server = Server()

@@ -87,7 +87,7 @@ class Server(Ice.Application):
 
         broker=self.communicator()
         servant =MainI()
-        adapter=broker.createObjectAdapter("MainAdapter")
+        adapter=broker.createObjectAdapter("IceFlixAdapter")
         proxy=adapter.addWithUUID(servant)
         print(proxy,flush=True)
 
