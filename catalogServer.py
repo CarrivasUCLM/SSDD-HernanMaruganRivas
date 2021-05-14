@@ -44,10 +44,6 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def addService(self, service, lista, current=None):
         lista.append(service)
         print(lista)
-    
-    def removeById(self, id, lista, current=None):
-        _id=format(id)
-        self.lista.remove(_id)
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))

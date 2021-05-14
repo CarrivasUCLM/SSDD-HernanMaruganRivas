@@ -1,8 +1,9 @@
 {
-  "carlos": {
-    "password_hash": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
-  },
-  "cristina": {
-    "password_hash": "15acfdc75fdb88851487238cd8442c5ecc8e0c31868ce9f52a4e2361ba899f2f"
-  }
+    "carlos": {
+        "password_hash": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+    },
+    "cristina": {
+        "current_token": "3qmV3HC1bvwJ3HrYaJgvGM8cmkYXk5771RPUP7UH",
+        "password_hash": "15acfdc75fdb88851487238cd8442c5ecc8e0c31868ce9f52a4e2361ba899f2f"
+    }
 }
