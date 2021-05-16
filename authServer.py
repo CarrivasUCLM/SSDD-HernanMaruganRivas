@@ -19,6 +19,8 @@ PASSWORD_HASH = 'password_hash'
 CURRENT_TOKEN = 'current_token'
 TOKEN_SIZE = 40
 
+
+
 def _build_token_():
     valid_chars = string.digits + string.ascii_letters
     return ''.join([random.choice(valid_chars) for _ in range(TOKEN_SIZE)])
@@ -73,13 +75,15 @@ class AuthenticatorI(IceFlix.Authenticator):
         self._users_[user][CURRENT_TOKEN] = new_token
         self.__commit__()
         self._active_tokens_.add(new_token)
+        print("Authorize new token for '{}'".format(user))
         return new_token
     
     def isAuthorized(self, authentication):
         '''Return if token is active'''
-        return token in self._active_tokens_
+        return authentication in self._active_tokens_
 
 class TokenRevocationI(IceFlix.TokenRevocation):
+    
     def revoke(self, authentication):
         return 0
 

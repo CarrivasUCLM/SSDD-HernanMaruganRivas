@@ -16,7 +16,8 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         self._id_= str(uuid.uuid4())
 
     def getTile(self, id):
-        return 0
+        media = IceFlix.Media()
+        return media
     
     def getTilesByName(self, name, exact):
         return True
@@ -31,34 +32,6 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         return 0
     
     def removeTags(self, id, tags, authentication):
-        return 0
-
-class StreamControllerI(IceFlix.StreamController):
-
-    def getSDP(self, authenticacion, port, current=None):
-        return 0
-    
-    def getSyncTopic(self, current=None):
-        return 0
-    
-    def refreshAuthentication (self, authenticacion, current = None):
-        return 0
-
-    def stop(self, current=None):
-        return 0
-    
-class StreamProviderI(IceFlix.StreamProvider):
-
-    def __init__(self):
-        self._id_= str(uuid.uuid4())
-
-    def getStream(self, id, authentication):
-        return 0
-    
-    def isAvailable(self, id):
-        return 0
-    
-    def reannounceMedia(self):
         return 0
         
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
@@ -107,10 +80,10 @@ class Server(Ice.Application):
         "Comunicacion directa"
         adapter.activate()
         broker2 = self.communicator()
-        stream_provider = StreamProviderI()
+        catalog = MediaCatalogI()
         adapter2 = broker2.createObjectAdapter("CatalogAdapter")
-        proxy=adapter.addWithUUID(stream_provider)
-        publisher_services.mediaService(IceFlix.StreamProviderPrx.checkedCast(proxy), stream_provider._id_)
+        proxy=adapter.addWithUUID(catalog)
+        publisher_services.catalogService(IceFlix.MediaCatalogPrx.checkedCast(proxy), catalog._id_)
         print("Waiting events... '{}'".format(proxy))
         topic.getPublisher()
         
