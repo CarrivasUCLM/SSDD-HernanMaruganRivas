@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 #-*- conding: utf-8 -*-
+
 import uuid
 import os.path
 import sys
@@ -7,9 +8,7 @@ import Ice
 import IceStorm
 import iceevents
 Ice.loadSlice('iceflix.ice')
-
 import IceFlix
-
 
 class StreamControllerI(IceFlix.StreamController):
 
@@ -101,7 +100,7 @@ class Server(Ice.Application):
         adapter.activate()
         broker2 = self.communicator()
         stream_provider = StreamProviderI()
-        adapter2 = broker2.createObjectAdapter("CatalogAdapter")
+        adapter2 = broker2.createObjectAdapter("MediaAdapter")
         proxy=adapter.addWithUUID(stream_provider)
         publisher_services.catalogService(IceFlix.StreamProviderPrx.checkedCast(proxy), stream_provider._id_)
         print("Waiting events... '{}'".format(proxy))
@@ -111,7 +110,6 @@ class Server(Ice.Application):
         topic.unsubscribe(proxy)
 
         return 0
-
 
 server = Server()
 sys.exit(server.main(sys.argv))

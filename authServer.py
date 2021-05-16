@@ -12,6 +12,7 @@ import logging
 import json
 import string
 import random
+import time
 
 
 USERS_FILE = 'users.json'
@@ -76,16 +77,25 @@ class AuthenticatorI(IceFlix.Authenticator):
         self.__commit__()
         self._active_tokens_.add(new_token)
         print("Authorize new token for '{}'".format(user))
+        self.contador_segundos(new_token)
         return new_token
     
     def isAuthorized(self, authentication):
         '''Return if token is active'''
         return authentication in self._active_tokens_
+    
+    def contador_segundos(self, token):
+        time.sleep(30)
+        token_revocation = TokenRevocationI()
+        token_revocation.revoke(token)
+        self._active_tokens_.remove(token)
+
 
 class TokenRevocationI(IceFlix.TokenRevocation):
     
     def revoke(self, authentication):
-        return 0
+        print("Sending revocation for:'{}'".format(authentication))
+    
 
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
