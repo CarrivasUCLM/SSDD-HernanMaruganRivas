@@ -78,7 +78,7 @@ class Server(Ice.Application):
 
     def run(self, argv):
 
-            '''Publisher'''
+        '''Publisher'''
         event = iceevents.IceEvents(self.communicator())
         topic_manager = event.get_topic_manager()
         topic = event.get_topic('ServiceAvailability')
@@ -102,7 +102,7 @@ class Server(Ice.Application):
         stream_provider = StreamProviderI()
         adapter2 = broker2.createObjectAdapter("MediaAdapter")
         proxy=adapter.addWithUUID(stream_provider)
-        publisher_services.catalogService(IceFlix.StreamProviderPrx.checkedCast(proxy), stream_provider._id_)
+        publisher_services.mediaService(IceFlix.StreamProviderPrx.checkedCast(proxy), stream_provider._id_)
         print("Waiting events... '{}'".format(proxy))
         topic.getPublisher()
         

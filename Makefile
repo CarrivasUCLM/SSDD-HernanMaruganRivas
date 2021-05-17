@@ -5,7 +5,8 @@ all:
 	$(MAKE) run-icestorm
 	$(MAKE) run-mainserver &
 	$(MAKE) run-authserver &
-	$(MAKE) run-catalogserver
+	$(MAKE) run-catalogserver &
+	$(MAKE) run-mediaserver
 
 run-mainserver:
 	./iceFlixServer.py --Ice.Config=IceFlixServer.config
@@ -17,7 +18,8 @@ run-authserver:
 run-catalogserver:
 	./catalogServer.py --Ice.Config=catalogServer.config
 
-
+run-mediaserver:
+	./mediaServer.py --Ice.Config=mediaServer.config media.json
 
 run-icestorm:
 	mkdir -p IceStorm/
