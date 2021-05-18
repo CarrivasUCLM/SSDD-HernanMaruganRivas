@@ -103,7 +103,7 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
 
     def addService(self, service, lista, current=None):
         lista.append(service)
-        print(lista)
+        "print(lista)"
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
@@ -114,9 +114,10 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         self.addService(service, self.listaAuth)
 
     def mediaService(self, service, id, current=None):
-        print("New media service:'{}'".format(id))
-        self.addService(service, self.listaMedia)
-
+        print("New media service:'{}'".format(id)+ "'{}'".format(service))
+        _id_=format(id)
+        self.listaMedia.append([service,_id_])
+        "print(self.listaMedia)"
 
 
 
