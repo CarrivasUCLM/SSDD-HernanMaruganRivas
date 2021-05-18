@@ -15,23 +15,28 @@ class MediaCatalogI(IceFlix.MediaCatalog):
     def __init__(self):
         self._id_= str(uuid.uuid4())
 
-    def getTile(self, id):
+    def getTile(self, id, current=None):
         media = IceFlix.Media()
+        if not id:
+            raise IceFlix.WrongMediaId
+
         return media
     
-    def getTilesByName(self, name, exact):
-        return True
+    def getTilesByName(self, name, exact, current=None):
+        listTitle=[]
+        listTitle.append('aaaa')
+        return listTitle
 
-    def getTilesByTags(self, tags, includeAllTags):
+    def getTilesByTags(self, tags, includeAllTags, current=None):
         return 0
 
-    def renameTile(self, id, name, authentication):
+    def renameTile(self, id, name, authentication, current=None):
         return 0
 
-    def addTags(self, id, tags, authentication):
+    def addTags(self, id, tags, authentication, current=None):
         return 0
     
-    def removeTags(self, id, tags, authentication):
+    def removeTags(self, id, tags, authentication, current=None):
         return 0
         
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
