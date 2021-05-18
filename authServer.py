@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 #-*- conding: utf-8 -*-
+from common import SERVICE_ANNOUNCEMENTS_TOPIC
+from common import AUTH_ANNOUNCEMENTS_TOPIC
 import uuid
 import os.path
 import sys
@@ -13,7 +15,6 @@ import json
 import string
 import random
 import time
-
 
 USERS_FILE = 'users.json'
 PASSWORD_HASH = 'password_hash'
@@ -76,8 +77,7 @@ class AuthenticatorI(IceFlix.Authenticator):
         self._users_[user][CURRENT_TOKEN] = new_token
         self.__commit__()
         self._active_tokens_.add(new_token)
-        print("Authorize new token for '{}'".format(user))
-        self.contador_segundos(new_token)
+        print("Authorize new token for {}".format(user))
         return new_token
     
     def isAuthorized(self, authentication):
@@ -86,16 +86,13 @@ class AuthenticatorI(IceFlix.Authenticator):
     
     def contador_segundos(self, token):
         time.sleep(30)
-        token_revocation = TokenRevocationI()
-        token_revocation.revoke(token)
+        self.publisher_token_revocation.revoke(token)
         self._active_tokens_.remove(token)
-
-
+    
 class TokenRevocationI(IceFlix.TokenRevocation):
-    
+
     def revoke(self, authentication):
-        print("Sending revocation for:'{}'".format(authentication))
-    
+        print("Sending revokation for:'{}'".format(authentication))
 
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
@@ -121,6 +118,9 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         self.addService(service, self.listaMedia)
 
 
+
+
+
 class Server(Ice.Application):
   
     def run(self, argv):
@@ -131,17 +131,14 @@ class Server(Ice.Application):
         publisher = event.get_publisher('ServiceAvailability')
         publisher_services = IceFlix.ServiceAvailabilityPrx.uncheckedCast(publisher)
         
-
-        
         '''Subscriber'''
         eventSubscriber = iceevents.IceEvents(self.communicator())
         broker = eventSubscriber.communicator()
-        topic_manager = eventSubscriber.get_topic_manager()
+        topic_manager_2 = eventSubscriber.get_topic_manager()
         servant = ServiceAvailabilityI()
         adapter=broker.createObjectAdapter("IceFlixAdapter")
         proxy_subscriber = adapter.addWithUUID(servant)
         eventSubscriber.subscribe('ServiceAvailability', proxy_subscriber)
-
 
         "Comunicacion directa"
         adapter.activate()
@@ -150,8 +147,35 @@ class Server(Ice.Application):
         adapter2 = broker2.createObjectAdapter("AuthAdapter")
         proxy=adapter.addWithUUID(autenticator)
         publisher_services.authenticationService(IceFlix.AuthenticatorPrx.checkedCast(proxy), autenticator._id_)
-        print("Waiting events... '{}'".format(proxy))
+        '''print("Waiting events... '{}'".format(proxy))'''
         topic.getPublisher()
+
+
+        '''AuthenticationStatusAdapter'''
+        topic_mgr = topic_manager
+        if not topic_mgr:
+            print("Invalid proxy")
+            return 2
+
+        ic = self.communicator()
+        servant = TokenRevocationI()
+        adapter = ic.createObjectAdapter("AuthenticationStatusAdapter")
+        subscriber = adapter.addWithUUID(servant)
+        topic_name = "AuthenticationStatus"
+        qos = {}
+
+        try:
+            topic = topic_mgr.retrieve(topic_name)
+        except IceStorm.NoSuchTopic:
+            topic = topic_mgr.create(topic_name)
+
+        topic.subscribeAndGetPublisher(qos, subscriber)
+        print("Waiting eventssssss... '{}'".format(subscriber))
+
+        publisher = topic.getPublisher()
+        publisher_revoke = IceFlix.TokenRevocationPrx.uncheckedCast(publisher)
+
+
         
         broker.waitForShutdown()
         topic.unsubscribe(proxy)
