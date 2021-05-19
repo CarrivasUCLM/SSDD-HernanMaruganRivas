@@ -10,21 +10,30 @@ import iceevents
 Ice.loadSlice('iceflix.ice')
 import IceFlix
 
+listaCatalog = []
+listaAuth=[]
+listaMedia=[]
+
 class MediaCatalogI(IceFlix.MediaCatalog):
     
     def __init__(self):
         self._id_= str(uuid.uuid4())
 
-    def getTile(self, id, current=None):
+    def getTile(self, _id, current=None):
         media = IceFlix.Media()
-        if not id:
+        media.id=_id
+        media.provider=None
+        info= IceFlix.MediaInfo()
+        media.mediaInfo=info
+
+        if not media.id:
             raise IceFlix.WrongMediaId
 
         return media
     
     def getTilesByName(self, name, exact, current=None):
         listTitle=[]
-        listTitle.append('aaaa')
+        listTitle.append('aaa')
         return listTitle
 
     def getTilesByTags(self, tags, includeAllTags, current=None):
@@ -40,10 +49,7 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         return 0
         
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
-    def __init__(self):
-        self.listaCatalog = []
-        self.listaAuth=[]
-        self.listaMedia=[]
+        
 
     def addService(self, service, lista, current=None):
         lista.append(service)
@@ -51,16 +57,16 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
 
     def catalogService(self, service, id, current=None):
         print("New catalog service: '{}'".format(id))
-        self.addService(service, self.listaCatalog)
+        self.addService(service, listaCatalog)
  
     def authenticationService(self, service, id, current=None):
         print("New authentication service:'{}'".format(id))
-        self.addService(service, self.listaAuth)
+        self.addService(service, listaAuth)
 
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id)+ "'{}'".format(service))
         _id_=format(id)
-        self.listaMedia.append([service,_id_])
+        listaMedia.append([service,_id_])
         "print(self.listaMedia)"
 
 class Server(Ice.Application):
@@ -91,7 +97,6 @@ class Server(Ice.Application):
         adapter2 = broker2.createObjectAdapter("CatalogAdapter")
         proxy=adapter.addWithUUID(catalog)
         publisher_services.catalogService(IceFlix.MediaCatalogPrx.checkedCast(proxy), catalog._id_)
-        print("Waiting events... '{}'".format(proxy))
         topic.getPublisher()
         
         broker.waitForShutdown()

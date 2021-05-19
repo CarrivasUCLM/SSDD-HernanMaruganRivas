@@ -105,7 +105,6 @@ class Server(Ice.Application):
         adapter2 = broker2.createObjectAdapter("MediaAdapter")
         proxy=adapter.addWithUUID(stream_provider)
         publisher_services.mediaService(IceFlix.StreamProviderPrx.checkedCast(proxy), stream_provider._id_)
-        print("Waiting events... '{}'".format(proxy))
         topic.getPublisher()
         
         broker.waitForShutdown()
