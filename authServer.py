@@ -80,7 +80,7 @@ class AuthenticatorI(IceFlix.Authenticator):
         print("Authorize new token for {}".format(user))
         return new_token
     
-    def isAuthorized(self, authentication):
+    def isAuthorized(self, authentication, current=None):
         '''Return if token is active'''
         return authentication in self._active_tokens_
     

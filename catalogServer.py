@@ -84,7 +84,8 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         return listID            
 
     def renameTile(self, id, name, authentication, current=None):
-        return 0
+        if listaAuth[-1].isAuthorized(authentication):
+            print("hola")
 
     def addTags(self, id, tags, authentication, current=None):
         return 0
