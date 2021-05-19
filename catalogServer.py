@@ -22,11 +22,19 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         self._id_= str(uuid.uuid4())
         self._media = IceFlix.Media()
         self._infoMedia = IceFlix.MediaInfo()
-  
+        self.listJson=self.cargar_peliculas()
 
     def cargar_peliculas(self):
         '''leer json'''
-        return 0
+        listJ=[]
+        o=open("media.json", "r")
+        content=o.read()
+        jsondecode=json.loads(content)
+        for entity in jsondecode["Calatog"]:
+            entityName= entity["Name"]
+            entityTag= entity["tag"]
+            listJ.append([entityName,entityTag])
+        return listJ
 
     def getTile(self, _id, current=None):
         '''if _id not in listTileMedia:
@@ -36,24 +44,24 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         self._media.info = self._infoMedia
         self._media.id=_id
         self._media.provider= None
-        self._media.info.name = "Pelicula"
-        self._media.info.tags = []
+        for i in self.listJson:
+            self._media.info.name = i[0]
+            self._media.info.tags = i[1]
+       
         return self._media
     
     def getTilesByName(self, name, exact, current=None):
-        listTile=[]
+        listID=[]
       
-        o=open("media.json", "r")
-        content=o.read()
-        jsondecode=json.loads(content)
-        for entity in jsondecode["Calatog"]:
-            entityName= entity["Name"]
-            print(entityName)
-            if name == entityName:
+        for i in self.listJson:
+            nameAux=i[0]
+            n = self.listJson.index(i)
+            if name == nameAux:
                 id=str(uuid.uuid4())
-                print(id)
-                listTile.append(id)
-        return listTile
+                listID.append(id)
+                self.listJson[n].append(id)
+            
+        return listID
 
     def getTilesByTags(self, tags, includeAllTags, current=None):
         return 0
