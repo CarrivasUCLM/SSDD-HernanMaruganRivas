@@ -13,6 +13,7 @@ import IceFlix
 listaCatalog = []
 listaAuth=[]
 listaMedia=[]
+listTileMedia=[]
 
 class MediaCatalogI(IceFlix.MediaCatalog):
     
@@ -20,21 +21,23 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         self._id_= str(uuid.uuid4())
 
     def getTile(self, _id, current=None):
+        
+        if _id not in listTileMedia:
+            raise IceFlix.WrongMediaId(_id) 
+        if not listaMedia:
+            raise IceFlix.TemporaryUnavailable()
+        
         media = IceFlix.Media()
         media.id=_id
-        media.provider=None
+        media.provider= None
         info= IceFlix.MediaInfo()
         media.mediaInfo=info
-
-        if not media.id:
-            raise IceFlix.WrongMediaId
 
         return media
     
     def getTilesByName(self, name, exact, current=None):
-        listTitle=[]
-        listTitle.append('aaa')
-        return listTitle
+        listTile=[]
+        return listTile
 
     def getTilesByTags(self, tags, includeAllTags, current=None):
         return 0
@@ -66,7 +69,7 @@ class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     def mediaService(self, service, id, current=None):
         print("New media service:'{}'".format(id)+ "'{}'".format(service))
         _id_=format(id)
-        listaMedia.append([service,_id_])
+        listaMedia.append([_id_, service])
         "print(self.listaMedia)"
 
 class Server(Ice.Application):
