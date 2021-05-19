@@ -18,14 +18,14 @@ class MainI(IceFlix.Main):
         if not listaAuth:
             raise IceFlix.TemporaryUnavailable()
         else:  
-            return listaAuth.pop() 
+            return listaAuth[0] 
 
     def getCatalogService(self, current=None):
         
         if not listaCatalog:
             raise IceFlix.TemporaryUnavailable()
         else:  
-            return listaCatalog.pop()
+            return listaCatalog[0]
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     

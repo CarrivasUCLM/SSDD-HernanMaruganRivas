@@ -36,7 +36,7 @@ class AuthenticatorI(IceFlix.Authenticator):
         if os.path.exists(USERS_FILE):
             self.refresh()
         else:
-           self.__commit__()
+            self.__commit__()
     
     def refresh(self, *args, **kwargs):
         '''Reload user DB to RAM'''
@@ -147,10 +147,10 @@ class Server(Ice.Application):
         broker2 = self.communicator()
         autenticator = AuthenticatorI()
         adapter2 = broker2.createObjectAdapter("AuthAdapter")
-        proxy=adapter.addWithUUID(autenticator)
+        proxy=adapter2.addWithUUID(autenticator)
         publisher_services.authenticationService(IceFlix.AuthenticatorPrx.checkedCast(proxy), autenticator._id_)
-        '''print("Waiting events... '{}'".format(proxy))'''
         topic.getPublisher()
+        adapter2.activate()
 
 
         '''AuthenticationStatusAdapter'''
