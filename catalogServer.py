@@ -9,6 +9,7 @@ import IceStorm
 import iceevents
 Ice.loadSlice('iceflix.ice')
 import IceFlix
+import json
 
 listaCatalog = []
 listaAuth=[]
@@ -19,24 +20,39 @@ class MediaCatalogI(IceFlix.MediaCatalog):
     
     def __init__(self):
         self._id_= str(uuid.uuid4())
+        self._media = IceFlix.Media()
+        self._infoMedia = IceFlix.MediaInfo()
+  
+
+    def cargar_peliculas(self):
+        '''leer json'''
+        return 0
 
     def getTile(self, _id, current=None):
-        
-        if _id not in listTileMedia:
-            raise IceFlix.WrongMediaId(_id) 
+        '''if _id not in listTileMedia:
+            raise IceFlix.WrongMediaId(_id)'''
         if not listaMedia:
             raise IceFlix.TemporaryUnavailable()
-        
-        media = IceFlix.Media()
-        media.id=_id
-        media.provider= None
-        info= IceFlix.MediaInfo()
-        media.mediaInfo=info
-
-        return media
+        self._media.info = self._infoMedia
+        self._media.id=_id
+        self._media.provider= None
+        self._media.info.name = "Pelicula"
+        self._media.info.tags = []
+        return self._media
     
     def getTilesByName(self, name, exact, current=None):
         listTile=[]
+      
+        o=open("media.json", "r")
+        content=o.read()
+        jsondecode=json.loads(content)
+        for entity in jsondecode["Calatog"]:
+            entityName= entity["Name"]
+            print(entityName)
+            if name == entityName:
+                id=str(uuid.uuid4())
+                print(id)
+                listTile.append(id)
         return listTile
 
     def getTilesByTags(self, tags, includeAllTags, current=None):
