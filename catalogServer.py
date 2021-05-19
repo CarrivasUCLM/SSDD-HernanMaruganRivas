@@ -75,7 +75,13 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         return listID
 
     def getTilesByTags(self, tags, includeAllTags, current=None):
-        return 0
+        listID=[]
+        if tags:
+            for i in self.listJson:
+                for j in i[2]:
+                    if j.upper() in map(str.upper, tags):
+                        listID.append(i[0])
+        return listID            
 
     def renameTile(self, id, name, authentication, current=None):
         return 0
