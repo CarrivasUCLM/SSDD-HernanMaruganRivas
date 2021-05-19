@@ -23,6 +23,8 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         self._media = IceFlix.Media()
         self._infoMedia = IceFlix.MediaInfo()
         self.listJson=self.cargar_peliculas()
+        self.listMediaId = self.cargar_id()
+    
 
     def cargar_peliculas(self):
         '''leer json'''
@@ -30,37 +32,46 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         o=open("media.json", "r")
         content=o.read()
         jsondecode=json.loads(content)
-        for entity in jsondecode["Calatog"]:
+        for entity in jsondecode["info"]:
             entityName= entity["Name"]
             entityTag= entity["tag"]
-            listJ.append([entityName,entityTag])
+            entityId=str(uuid.uuid4())
+            listJ.append([entityId,entityName,entityTag])
         return listJ
 
+    def cargar_id(self):
+        listId = []
+        for i in self.listJson:
+            listId.append(i[0])
+        return listId
+
     def getTile(self, _id, current=None):
-        '''if _id not in listTileMedia:
-            raise IceFlix.WrongMediaId(_id)'''
+        if _id not in self.listMediaId:
+            raise IceFlix.WrongMediaId(_id)
         if not listaMedia:
             raise IceFlix.TemporaryUnavailable()
         self._media.info = self._infoMedia
         self._media.id=_id
-        self._media.provider= None
+        self._media.provider= listaMedia[0][1]
         for i in self.listJson:
-            self._media.info.name = i[0]
-            self._media.info.tags = i[1]
+            if i[0] == _id:
+                self._media.info.name = i[1]
+                self._media.info.tags = i[2]
        
         return self._media
     
     def getTilesByName(self, name, exact, current=None):
         listID=[]
-      
-        for i in self.listJson:
-            nameAux=i[0]
-            n = self.listJson.index(i)
-            if name == nameAux:
-                id=str(uuid.uuid4())
-                listID.append(id)
-                self.listJson[n].append(id)
-            
+        if name :
+            for i in self.listJson:
+                nameAux=i[1]
+                if name.upper() == nameAux.upper():
+                    listID.append(i[0])
+                elif name.upper()  in nameAux.upper():
+                    listID.append(i[0])       
+        else:
+            for i in self.listJson:
+                listID.append(i[0])
         return listID
 
     def getTilesByTags(self, tags, includeAllTags, current=None):

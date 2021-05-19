@@ -1,13 +1,20 @@
-{
-    "Calatog":[
-        {
-            "Name":"Pelicula.mp4",
-            "tag": "Comedia"
-        },
+{   
+    "info":[
         {
             "Name": "El rey leon.mp4",
             "tag": ["Risa", "Comedia"]
+        }, 
+        {
+            "Name":"Uno",
+            "tag":["Terror"]
+        },
+        {
+            "Name" : "Dos",
+            "tag": ["Comedia"]
         }
     ]
     
 }
+
+
+

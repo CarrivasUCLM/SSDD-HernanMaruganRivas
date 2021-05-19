@@ -140,9 +140,10 @@ class Server(Ice.Application):
         adapter=broker.createObjectAdapter("IceFlixAdapter")
         proxy_subscriber = adapter.addWithUUID(servant)
         eventSubscriber.subscribe('ServiceAvailability', proxy_subscriber)
+        adapter.activate()
+
 
         "Comunicacion directa"
-        adapter.activate()
         broker2 = self.communicator()
         autenticator = AuthenticatorI()
         adapter2 = broker2.createObjectAdapter("AuthAdapter")
