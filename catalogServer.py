@@ -24,6 +24,7 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         self._infoMedia = IceFlix.MediaInfo()
         self.listJson=self.cargar_peliculas()
         self.listMediaId = self.cargar_id()
+        self._rename_Tittle=set()
     
 
     def cargar_peliculas(self):
@@ -39,6 +40,17 @@ class MediaCatalogI(IceFlix.MediaCatalog):
             listJ.append([entityId,entityName,entityTag])
         return listJ
 
+    def renameInJson(self):
+        '''Abrir JSon y escribir'''
+        print(self.listJson)
+        for element in self.listJson:
+            data="info", {"Name": element[1],"tag": element[2]}
+
+            with open("media.json", "w") as infoNew:
+                json.dump(data, infoNew, indent=2, sort_keys=True)
+            
+        return 0
+        
     def cargar_id(self):
         listId = []
         for i in self.listJson:
@@ -84,8 +96,16 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         return listID            
 
     def renameTile(self, id, name, authentication, current=None):
-        if listaAuth[-1].isAuthorized(authentication):
-            print("hola")
+        if id not in self.listMediaId:
+            raise IceFlix.WrongMediaId(id)
+
+        print(name)
+        for i in self.listJson:
+            if i[0] == id:
+                nameold=i[1]
+                i[1]=name
+                print(self.listJson)
+                self.renameInJson()
 
     def addTags(self, id, tags, authentication, current=None):
         return 0
