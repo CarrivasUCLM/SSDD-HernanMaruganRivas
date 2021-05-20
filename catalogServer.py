@@ -43,13 +43,18 @@ class MediaCatalogI(IceFlix.MediaCatalog):
     def renameInJson(self):
         '''Abrir JSon y escribir'''
         print(self.listJson)
+        data = {}
+        info = []
+        pelicula = []
         for element in self.listJson:
-            data="info", {"Name": element[1],"tag": element[2]}
+            pelicula = {"Name": element[1], "tag": element[2]}
+            info.append(pelicula)
 
-            with open("media.json", "w") as infoNew:
-                json.dump(data, infoNew, indent=2, sort_keys=True)
+        data = {"info":info}
+        with open("media.json", "w") as infoNew:
+            json.dump(data, infoNew, indent=2, sort_keys=True)
             
-        return 0
+    
         
     def cargar_id(self):
         listId = []
