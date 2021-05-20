@@ -16,8 +16,8 @@ except ImportError:
     logging.warning('python-vlc required for player!')
 
 # pylint: disable=C0301
-TEST_PIPE = 'videotestsrc ! openh264enc ! rtph264pay config-interval=10 pt=96 ! udpsink host={} port={}'
-FILE_PIPE = 'filesrc location="{}" ! decodebin ! openh264enc ! rtph264pay config-interval=10 pt=96 ! udpsink host={} port={}'
+TEST_PIPE = 'videotestsrc ! x264enc ! rtph264pay config-interval=10 pt=96 ! udpsink host={} port={}'
+FILE_PIPE = 'filesrc location="{}" ! decodebin ! x64enc ! rtph264pay config-interval=10 pt=96 ! udpsink host={} port={}'
 SDP_DATA = '''v=0
 m=video {} RTP/AVP 96
 c=IN IP4 {}
