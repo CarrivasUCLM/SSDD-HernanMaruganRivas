@@ -54,8 +54,6 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         with open("media.json", "w") as infoNew:
             json.dump(data, infoNew, indent=2, sort_keys=True)
             
-    
-        
     def cargar_id(self):
         listId = []
         for i in self.listJson:
@@ -104,19 +102,33 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         if id not in self.listMediaId:
             raise IceFlix.WrongMediaId(id)
 
-        print(name)
         for i in self.listJson:
             if i[0] == id:
-                nameold=i[1]
                 i[1]=name
-                print(self.listJson)
                 self.renameInJson()
 
     def addTags(self, id, tags, authentication, current=None):
-        return 0
+        if id not in self.listMediaId:
+            raise IceFlix.WrongMediaId(id)
+        
+        for pelicula in self.listJson:
+            if pelicula[0] == id:
+                for tag in tags:
+                    pelicula[2].append(tag)
+        
+        self.renameInJson()
     
     def removeTags(self, id, tags, authentication, current=None):
-        return 0
+        if id not in self.listMediaId:
+            raise IceFlix.WrongMediaId(id)
+        for pelicula in self.listJson:
+            if pelicula[0] == id:
+                for tag in tags:
+                    for tag_peli in pelicula[2]:
+                        if tag == tag_peli:
+                            pelicula[2].pop(pelicula[2].index(tag_peli))
+        self.renameInJson()
+        
         
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
         
