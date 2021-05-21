@@ -2,6 +2,7 @@
 #-*- conding: utf-8 -*-
 
 import sys
+import logging
 import Ice
 Ice.loadSlice('iceflix.ice')
 
@@ -14,18 +15,30 @@ listaMedia=[]
 
 class MainI(IceFlix.Main):
     def getAuthenticator(self, current=None):
-        
-        if not listaAuth:
+        auth=MainI.service_up(listaAuth)
+        if not auth:
             raise IceFlix.TemporaryUnavailable()
         else:  
-            return listaAuth[-1] 
+            return auth 
 
     def getCatalogService(self, current=None):
-        
-        if not listaCatalog:
+        catalog=MainI.service_up(listaCatalog)
+        if not catalog:
             raise IceFlix.TemporaryUnavailable()
         else:  
-            return listaCatalog[-1]
+            return catalog
+    
+    def service_up(list):
+        for service in list:
+            try:
+                service.ice_ping()
+                return service
+            except Exception as error:
+                logging.warning('Microservice does not exist: {}'.format(service))
+                print(listaAuth)
+                listaAuth.remove(service)
+                print(listaAuth)
+        return None
 
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
     
