@@ -15,20 +15,20 @@ listaMedia=[]
 
 class MainI(IceFlix.Main):
     def getAuthenticator(self, current=None):
-        auth=MainI.service_up(listaAuth)
+        auth=self.service_up(listaAuth)
         if not auth:
             raise IceFlix.TemporaryUnavailable()
         else:  
             return auth 
 
     def getCatalogService(self, current=None):
-        catalog=MainI.service_up(listaCatalog)
+        catalog=self.service_up(listaCatalog)
         if not catalog:
             raise IceFlix.TemporaryUnavailable()
         else:  
             return catalog
     
-    def service_up(list):
+    def service_up(self,list):
         for service in list:
             try:
                 service.ice_ping()
@@ -36,7 +36,7 @@ class MainI(IceFlix.Main):
             except Exception as error:
                 logging.warning('Microservice does not exist: {}'.format(service))
                 print(listaAuth)
-                listaAuth.remove(service)
+                list.remove(service)
                 print(listaAuth)
         return None
 

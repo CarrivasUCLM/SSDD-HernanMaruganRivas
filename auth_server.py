@@ -88,6 +88,7 @@ class AuthenticatorI(IceFlix.Authenticator):
 
     def isAuthorized(self, authentication, current=None):
         '''Return if token is active'''
+        self.refresh()
         return authentication in self._active_tokens_
 
 class TokenRevocationI(IceFlix.TokenRevocation):

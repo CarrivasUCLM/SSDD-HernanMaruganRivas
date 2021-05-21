@@ -3,6 +3,7 @@
 
 import uuid
 import os.path
+import logging
 import sys
 import Ice
 import IceStorm
@@ -99,35 +100,63 @@ class MediaCatalogI(IceFlix.MediaCatalog):
         return listID            
 
     def renameTile(self, id, name, authentication, current=None):
-        if id not in self.listMediaId:
-            raise IceFlix.WrongMediaId(id)
+        auth=self.service_up(listaAuth)
+        if not auth:
+            raise IceFlix.TemporaryUnavailable()
+        else:
+            if auth.isAuthorized(authentication):
+                if id not in self.listMediaId:
+                    raise IceFlix.WrongMediaId(id)
 
-        for i in self.listJson:
-            if i[0] == id:
-                i[1]=name
-                self.renameInJson()
+                for i in self.listJson:
+                    if i[0] == id:
+                        i[1]=name
+                        self.renameInJson()
 
     def addTags(self, id, tags, authentication, current=None):
-        if id not in self.listMediaId:
-            raise IceFlix.WrongMediaId(id)
-        
-        for pelicula in self.listJson:
-            if pelicula[0] == id:
-                for tag in tags:
-                    pelicula[2].append(tag)
-        
-        self.renameInJson()
+        auth=self.service_up(listaAuth)
+        if not auth:
+            raise IceFlix.TemporaryUnavailable()
+        else:
+            if auth.isAuthorized(authentication):
+                if id not in self.listMediaId:
+                    raise IceFlix.WrongMediaId(id)
+                
+                for pelicula in self.listJson:
+                    if pelicula[0] == id:
+                        for tag in tags:
+                            pelicula[2].append(tag)
+                
+                self.renameInJson()
     
     def removeTags(self, id, tags, authentication, current=None):
-        if id not in self.listMediaId:
-            raise IceFlix.WrongMediaId(id)
-        for pelicula in self.listJson:
-            if pelicula[0] == id:
-                for tag in tags:
-                    for tag_peli in pelicula[2]:
-                        if tag == tag_peli:
-                            pelicula[2].pop(pelicula[2].index(tag_peli))
-        self.renameInJson()
+        auth=self.service_up(listaAuth)
+        if not auth:
+            raise IceFlix.TemporaryUnavailable()
+        else:
+            if auth.isAuthorized(authentication):
+                if id not in self.listMediaId:
+                    raise IceFlix.WrongMediaId(id)
+                for pelicula in self.listJson:
+                    if pelicula[0] == id:
+                        for tag in tags:
+                            for tag_peli in pelicula[2]:
+                                if tag == tag_peli:
+                                    pelicula[2].pop(pelicula[2].index(tag_peli))
+                self.renameInJson()
+
+    def service_up(self, list):
+        for service in list:
+            try:
+                service.ice_ping()
+                return service
+            except Exception as error:
+                logging.warning('Microservice does not exist: {}'.format(service))
+                print(listaAuth)
+                listaAuth.remove(service)
+                print(listaAuth)
+        return None
+
         
         
 class ServiceAvailabilityI(IceFlix.ServiceAvailability):
