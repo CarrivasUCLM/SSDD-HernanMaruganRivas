@@ -1,0 +1,4 @@
+#!/bin/bash
+mkdir -p IceStorm/
+gnome-terminal -- bash -c \
+"icebox --Ice.Config=icebox.config; bash"

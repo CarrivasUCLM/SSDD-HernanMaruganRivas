@@ -12,7 +12,7 @@ run-mainserver:
 	./iceFlixServer.py --Ice.Config=IceFlixServer.config
 
 run-authserver:
-	./auth_server.py --Ice.Config=authServer.config users.json
+	./authServer.py --Ice.Config=authServer.config users.json
 
 
 run-catalogserver:

@@ -1,0 +1,14 @@
+#!/bin/bash
+gnome-terminal -- bash -c \
+"./iceFlixServer.py --Ice.Config=IceFlixServer.config; bash"
+
+gnome-terminal -- bash -c \
+"./catalogServer.py --Ice.Config=catalogServer.config; bash"
+
+gnome-terminal -- bash -c \
+"./mediaServer.py --Ice.Config=mediaServer.config media.json; bash"
+
+gnome-terminal -- bash -c \
+"./authServer.py --Ice.Config=authServer.config users.json; bash"
+
+
